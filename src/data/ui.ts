@@ -49,6 +49,10 @@ interface UiText {
     inCategory: string
     moreTopics: string
     moreInTopic: string
+    /** Artículo i de n dentro de su tema ("1 de 4"). */
+    step: (i: number, n: number) => string
+    nextInTopic: string
+    nextTopic: string
     dateLocale: string
   }
   empty: { soon: string; notFound: string; backHome: string }
@@ -125,6 +129,9 @@ export const UI: Record<Lang, UiText> = {
       inCategory: 'In this topic',
       moreTopics: 'Other topics',
       moreInTopic: 'More on this topic',
+      step: (i, n) => `${i} of ${n}`,
+      nextInTopic: 'Next in this topic',
+      nextTopic: 'Next topic',
       dateLocale: 'en-US',
     },
     faqSoon: {
@@ -204,6 +211,9 @@ export const UI: Record<Lang, UiText> = {
       inCategory: 'En este tema',
       moreTopics: 'Otros temas',
       moreInTopic: 'Más de este tema',
+      step: (i, n) => `${i} de ${n}`,
+      nextInTopic: 'Siguiente en el tema',
+      nextTopic: 'Siguiente tema',
       dateLocale: 'es-MX',
     },
     faqSoon: {

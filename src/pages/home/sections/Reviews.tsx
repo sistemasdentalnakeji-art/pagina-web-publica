@@ -15,7 +15,7 @@ import { UI } from '@/data/ui'
 import { REVIEWS_SECTION } from '@/data/home'
 import { Marquee } from '@/components/ui/Marquee'
 import { Band } from '@/components/decor/Band'
-import { SectionDecor } from '@/components/decor/SectionDecor'
+import { ParticlesBackground } from '@/components/decor/ParticlesBackground'
 import { ExternalLink } from '@/components/ui/ExternalLink'
 import { Stars } from '@/components/ui/Stars'
 import { useGoogleReviews } from '@/lib/useGoogleReviews'
@@ -125,7 +125,10 @@ export function Reviews() {
   const shift = Math.ceil(cards.length / 2)
   const cardsBottom = [...cards.slice(shift), ...cards.slice(0, shift)]
   return (
-    <Band tone="tint" className="reviews-band" labelledBy="resenas-titulo" decor={<SectionDecor variant="rings" placement="reviews" />}>
+    <Band tone="tint" className="reviews-band" labelledBy="resenas-titulo">
+      {/* Prismas de las orillas: solo detrás de "Google" y la ventana; las filas de reseñas de abajo quedan sin ellos. */}
+      <div className="reviews-top">
+        <ParticlesBackground density={110} max={180} />
       <div className="container">
         <div className="reviews-intro">
           <div className="reviews-intro__google">
@@ -177,6 +180,7 @@ export function Reviews() {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       {cards.length > 0 && (

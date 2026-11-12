@@ -15,6 +15,17 @@ import { applyHead } from '@/seo/head'
 import { motionOff, pauseOffscreen } from '@/lib/motion'
 import '@/styles/index.css'
 
+// Estadísticas de Vercel (visitas y velocidad real de carga). Solo en la página publicada y cuando el navegador queda libre, para
+// no competir con la carga del héroe. Sin cookies; los scripts salen del mismo dominio (/_vercel/…), así que la CSP no cambia.
+if (import.meta.env.PROD) {
+  const start = async () => {
+    const [{ inject }, { injectSpeedInsights }] = await Promise.all([import('@vercel/analytics'), import('@vercel/speed-insights')])
+    inject()
+    injectSpeedInsights()
+  }
+  window.addEventListener('load', () => ('requestIdleCallback' in window ? requestIdleCallback(start, { timeout: 4000 }) : setTimeout(start, 2000)), { once: true })
+}
+
 // "Agendar" desde otra página llega a /…/#agendar: primero se ve el inicio y luego baja suave al formulario. El ancla no existe
 // al cargar (la sección llega diferida o se hidrata), por eso se espera a que aparezca en lugar de confiar en el salto del navegador.
 const scheduleId = window.location.hash.slice(1)

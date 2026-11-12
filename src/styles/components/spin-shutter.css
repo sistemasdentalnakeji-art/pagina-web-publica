@@ -149,31 +149,6 @@
   pointer-events: none;
 }
 
-/* Anterior / siguiente. */
-.spin-shutter__bar {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  justify-content: center;
-}
-
-.spin-shutter__nav {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--color-white);
-  cursor: pointer;
-  transition: background-color var(--dur-fast) var(--ease-out);
-}
-
-.spin-shutter__nav:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
 .spin-shutter__card:focus-visible {
   opacity: 1 !important;
   filter: none !important;

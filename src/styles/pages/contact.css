@@ -354,16 +354,6 @@
   color: var(--color-white);
 }
 
-/* Trama de puntos que se desvanece hacia abajo. */
-.social-wall::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(rgb(255 255 255 / 0.12) 1px, transparent 1px) 0 0 / 24px 24px;
-  mask-image: linear-gradient(to bottom, #000, transparent 70%);
-}
-
 .social-wall__intro {
   display: flex;
   flex-direction: column;

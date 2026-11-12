@@ -7,11 +7,14 @@
   pointer-events: none;
 }
 
-/* Lo dorado (mancha o línea) se recorta donde empieza el footer (--gl-clip la calcula GlassLights.tsx). */
+/* Lo dorado (mancha o línea) se apaga al llegar al footer (--gl-clip = cuánto del footer se ve; lo calcula GlassLights.tsx).
+   Se desvanece en una franja de hasta 260 px sobre el footer, en vez de cortarse en línea recta (se notaba la orilla). */
 .glass-lights__gold {
+  --gl-fade: min(var(--gl-clip, 0px), 260px);
   position: absolute;
   inset: 0;
-  clip-path: inset(0 0 var(--gl-clip, 0px) 0);
+  -webkit-mask-image: linear-gradient(to top, transparent var(--gl-clip, 0px), #000 calc(var(--gl-clip, 0px) + var(--gl-fade)));
+  mask-image: linear-gradient(to top, transparent var(--gl-clip, 0px), #000 calc(var(--gl-clip, 0px) + var(--gl-fade)));
 }
 
 .glass-lights__blob {

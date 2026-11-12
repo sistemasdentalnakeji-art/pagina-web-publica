@@ -438,13 +438,30 @@
 /* ---------- Migas de pan (sobre azul noche) ---------- */
 .blog-crumbs ol {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  margin: 0 0 40px;
+  margin: 0 0 28px;
   padding: 0;
   color: var(--color-sky-strong);
   font-size: 0.875rem;
   list-style: none;
+}
+
+/* Una sola línea: los enlaces quedan completos y la última miga (el título, que ya está abajo) se recorta con "…".
+   contain: el ancho de la línea completa no ensancha la columna del encabezado (en celular se salía de la pantalla). */
+.blog-crumbs {
+  contain: inline-size;
+}
+
+.blog-crumbs li {
+  flex: none;
+  white-space: nowrap;
+}
+
+.blog-crumbs li:last-child {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .blog-crumbs li + li::before {
@@ -541,13 +558,12 @@
   line-height: 1.75;
 }
 
-/* La respuesta llega primero: una hoja blanca con barra dorada. */
+/* La respuesta llega primero: una hoja blanca; su título lleva la rayita dorada corta del resto del sitio. */
 .blog-answer {
   margin: 0 0 var(--space-6);
   padding: var(--space-5) var(--space-6);
   border: var(--border-hairline);
-  border-left: 6px solid var(--color-gold);
-  border-radius: var(--radius-xs) var(--radius-lg) var(--radius-lg) var(--radius-xs);
+  border-radius: var(--radius-card);
   background: var(--color-white);
   box-shadow: var(--shadow-1);
   color: var(--color-text);
@@ -559,10 +575,26 @@
 
 .blog-answer strong {
   display: block;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
   color: var(--color-ink-strong);
   font-size: 1.5rem;
   line-height: 1.2;
+}
+
+.blog-answer strong::after {
+  content: '';
+  display: block;
+  width: var(--gold-rule-w);
+  height: var(--gold-rule-h);
+  margin-top: var(--space-2);
+  border-radius: var(--gold-rule-radius);
+  background: var(--gold-rule-bg);
+}
+
+/* Selección de texto con el azul claro de la marca (no el azul del navegador). */
+.blog-article__body ::selection {
+  background: rgb(123 195 235 / 0.35);
+  color: var(--color-ink-strong);
 }
 
 /* Cada sección es una tarjeta desplegable (mismo diseño que las de Términos y condiciones): el título arriba, separado por una
@@ -878,12 +910,6 @@
     padding-top: var(--space-5);
   }
 
-  /* La hoja de lectura usa casi todo el ancho: más palabras por línea, menos alto. */
-  .blog-dark .blog-article .blog-article__body {
-    margin-inline: -10px;
-    padding: 20px 14px;
-  }
-
   .blog-article__body {
     font-size: 1rem;
     line-height: 1.65;
@@ -934,9 +960,10 @@
   color: rgb(213 232 246 / 0.8);
 }
 
-/* En la página del blog, los cinco títulos de categoría van en azul fijo (sin cambio al pasar el cursor). */
+/* En la página del blog, los cinco títulos de categoría van en blanco fijo (el azul claro se perdía sobre el brillo del fondo). */
 .blog-dark .blog-shelf__title a {
-  color: var(--color-brand-light);
+  color: var(--color-white);
+  text-shadow: 0 1px 12px rgb(10 21 41 / 0.6);
 }
 
 .blog-dark .blog-topics {
@@ -963,9 +990,38 @@
   color: rgb(213 232 246 / 0.75);
 }
 
-/* Tarjetas: el mismo vidrio, pero más claro para que no se vea gris sobre el fondo oscuro. */
+/* Tarjetas de artículo: el vidrio azul del sitio (el mismo de las tarjetas de Contacto y de la hoja del artículo). */
 .blog-dark .blog-card__frame {
-  background: rgb(247 249 253 / 0.95);
+  border-color: var(--card-blue-border);
+  background: var(--glass-layers);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+}
+
+.blog-dark .blog-card__title {
+  color: var(--card-blue-title);
+}
+
+.blog-dark .blog-card__excerpt,
+.blog-dark .blog-card__stamp,
+.blog-dark .blog-card__date {
+  color: var(--card-blue-text);
+}
+
+.blog-dark .blog-card__meta {
+  border-top-color: var(--card-blue-line);
+}
+
+.blog-dark .blog-card__topic {
+  color: var(--color-brand-light);
+}
+
+/* El logo es azul oscuro: sobre el vidrio azul se pinta blanco (en celular va dentro de su píldora blanca y queda como está). */
+@media (width >= 600px) {
+  .blog-dark .blog-card__brand {
+    filter: brightness(0) invert(1);
+  }
 }
 
 /* El botón del cierre del artículo va sobre la hoja clara: vuelve al azul de marca (el blanco de .blog-head es para fondos oscuros). */
@@ -1020,26 +1076,26 @@
   background: rgb(255 255 255 / 0.12);
 }
 
-/* Artículo (todos): la hoja es el azul de tarjeta de la marca y encima van tarjetas blancas (respuesta, secciones, cierre),
-   que son las que llevan el texto largo. */
-.blog-dark .blog-article__body {
-  padding: var(--space-6) clamp(20px, 4vw, var(--space-7));
-  border: 1px solid var(--card-blue-border);
-  border-radius: var(--radius-xl);
-  background: var(--card-blue);
-  box-shadow: var(--card-blue-shadow);
-}
-
+/* Artículo (todos): las tarjetas blancas (respuesta, secciones, cierre) van directo sobre el fondo, sin hoja azul debajo
+   (tarjeta dentro de tarjeta encajonaba el texto y en celular le quitaba ancho). */
 .blog-dark .blog-article {
   padding-top: var(--space-7);
 }
 
 .blog-dark .chapter__line {
-  background: var(--color-white);
+  background: rgb(255 255 255 / 0.7);
 }
 
 .blog-dark .chapter__line[data-state='active'] {
-  background: var(--color-brand-light);
+  background: var(--color-gold);
+}
+
+/* Título de la sección junto al riel: vidrio azul del sitio en vez de una burbuja blanca sobre el fondo oscuro. */
+.blog-dark .chapter__card {
+  border-color: var(--card-blue-border);
+  background: var(--card-blue);
+  box-shadow: var(--card-blue-shadow);
+  color: var(--card-blue-title);
 }
 
 /* Móvil: el blog es una página muy larga y la lava (plasma con máscara sobre toda la altura) se ve mal en el teléfono.
@@ -1047,13 +1103,6 @@
 @media (width < 768px) {
   .blog-dark .page-plasma {
     display: none;
-  }
-}
-
-@media (width < 960px) {
-  .blog-dark .blog-article__body {
-    padding-inline: var(--space-4);
-    border-radius: var(--radius-lg);
   }
 }
 

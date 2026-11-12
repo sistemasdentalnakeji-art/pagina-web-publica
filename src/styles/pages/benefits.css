@@ -15,7 +15,8 @@
   --promo-red: #e0262d;
   /* clip (no hidden): hidden convertiría la banda en contenedor de scroll y el sticky del plasma dejaría de funcionar. */
   overflow: clip;
-  padding-bottom: 16px;
+  /* Aire entre la tarjeta de WhatsApp y el pie de página. */
+  padding-bottom: clamp(56px, 7vw, 96px);
 }
 
 /* ---------- Encabezado: titular y, debajo, la lista en renglones a todo el ancho ---------- */
@@ -347,6 +348,17 @@ html[data-motion='paused'] .benefit-card__badge {
   clip-path: inset(0);
 }
 
+/* Al arrancarse, la línea de la perforación se quita: así la orilla de arriba del talón queda solo punteada (roja o verde). */
+.benefit-card__footer::before,
+.benefits-cta__stub::before {
+  transition: opacity 0.3s var(--ease);
+}
+
+.benefit-grid__item:has(.benefit-card__arrow:hover, .benefit-card__arrow:focus-visible) .benefit-card__footer::before,
+.benefits-cta:has(.benefits-cta__btn:hover, .benefits-cta__btn:focus-visible) .benefits-cta__stub::before {
+  opacity: 0;
+}
+
 /* Se arranca el talón: se corta la esquina de la pieza y gira el contenedor. */
 .benefit-grid__item:has(.benefit-card__arrow:hover, .benefit-card__arrow:focus-visible) .benefit-card__footer {
   clip-path: polygon(0 0, calc(100% - var(--fold)) 0, 100% var(--fold), 100% 100%, 0 100%);
@@ -356,14 +368,13 @@ html[data-motion='paused'] .benefit-card__badge {
   transform: translateY(3px) rotate(3deg);
 }
 
-/* Contorno rojo del talón: izquierda, abajo y derecha con el borde punteado (la parte de arriba la pone el renglón rojo) y
-   la esquina cortada con una diagonal. Sigue la forma real de la pieza, no un rectángulo. */
+/* Contorno rojo del talón: los cuatro lados punteados (arriba incluido: el renglón del talón queda debajo del vidrio y no
+   se ve) y la esquina cortada con una diagonal. Sigue la forma real de la pieza, no un rectángulo. */
 .benefit-card__outline {
   position: absolute;
   inset: 0;
   z-index: 3;
   border: 2px dashed var(--promo-red);
-  border-top: 0;
   border-radius: 0 0 28px 28px;
   clip-path: polygon(0 0, calc(100% - var(--fold)) 0, 100% var(--fold), 100% 100%, 0 100%);
   opacity: 0;

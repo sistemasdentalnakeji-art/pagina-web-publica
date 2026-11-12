@@ -34,36 +34,36 @@ export const TESTIMONIALS_SECTION: Record<
  * Videos verticales (9:16) del panel izquierdo (acordeón de videos). `name` es lo que se lee en la tira cerrada.
  * Reels de @dentalnakeji (Instagram): DdxDNxfSXhu (Aron), DdZy3A0Shzm (Casey), DdUs65KSiPe (Precisión), DdsI7U7oosh (Equipo).
  */
-export const TESTIMONIAL_VIDEOS: { src: string; name: string; label: Record<Lang, string> }[] = [
+export const TESTIMONIAL_VIDEOS: { src: string; name: Record<Lang, string>; label: Record<Lang, string> }[] = [
   {
     src: '/videos/testimonios/paciente-san-diego.mp4',
-    name: 'Aron',
+    name: { es: 'Aron', en: 'Aron' },
     label: { es: 'Video: Aron, paciente de San Diego, con implantes', en: 'Video: Aron, a San Diego patient with implants' },
   },
   {
     src: '/videos/testimonios/casey-missouri.mp4',
-    name: 'Casey',
+    name: { es: 'Casey', en: 'Casey' },
     label: { es: 'Video: Casey, paciente de Missouri', en: 'Video: Casey, a patient from Missouri' },
   },
   {
     src: '/videos/testimonio-dental-nakeji.mp4',
-    name: 'Natalie',
+    name: { es: 'Natalie', en: 'Natalie' },
     label: { es: 'Video: Natalie, paciente de Dental Nakeji', en: 'Video: Natalie, a Dental Nakeji patient' },
   },
   {
     src: '/videos/testimonios/precision.mp4',
-    name: 'Equipo',
+    name: { es: 'Equipo', en: 'Team' },
     label: { es: 'Video: nuestro equipo en consulta', en: 'Video: our team at work' },
   },
   {
     src: '/videos/testimonios/equipo.mp4',
-    name: 'Equipo',
+    name: { es: 'Equipo', en: 'Team' },
     label: { es: 'Video: nuestro equipo en consulta', en: 'Video: our team at work' },
   },
 ]
 
-// Tres reseñas reales de Google (perfil Dental Nakeji, 3 nov 2026), copiadas tal cual; en inglés, traducción.
-// Máximo 4 (se muestran las 4 primeras). Para cambiarlas, edita esta lista.
+// Reseñas reales de Google (perfil Dental Nakeji, 3 y 12 nov 2026), copiadas tal cual; en inglés, traducción.
+// Máximo 5 (se muestran las 5 primeras). Para cambiarlas, edita esta lista.
 // Estrellas: las tres muestran 5 (decisión del sitio); si una reseña tiene otra calificación en Google, cámbiala aquí.
 //
 // Fotos de archivo (public/images/testimonios): no son de quienes escribieron las reseñas. Para usar la foto de un
@@ -122,6 +122,15 @@ export const TESTIMONIALS: Testimonial[] = [
     quote: {
       es: 'Excelente atención por parte del Dr. Sergio, es muy cuidadoso, paciente y te explica los pasos del procedimiento que te va realizando. Quedé muy satisfecha con su trabajo.',
       en: 'Excellent care from Dr. Sergio. He is very careful and patient, and he explains each step of the procedure as he goes. I was very happy with his work.',
+    },
+    rating: 5,
+  },
+  // Reseña de Google (Angel Beltran, nov 2026), completa y sin recortar.
+  {
+    name: 'Angel Beltran',
+    quote: {
+      es: 'Muy profesionales, pacientes más que nada, y muy buenas personas que ven lo mejor para ti. Gracias a todo el equipo.',
+      en: 'Very professional, above all patient, and very good people who look out for what is best for you. Thank you to the whole team.',
     },
     rating: 5,
   },

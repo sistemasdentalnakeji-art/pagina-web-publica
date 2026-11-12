@@ -838,3 +838,31 @@ html[data-motion='paused'] .tcard__panel {
   justify-items: end;
   place-items: center end;
 }
+
+/* ── Reseñas sin foto: la tarjeta abierta usa todo el ancho para la cita; la tira cerrada es solo cristal con el nombre ── */
+.tcard--review .tcard__cover {
+  display: none;
+}
+
+.tcard--review .tcard__panel,
+.tcard--review.is-open .tcard__panel {
+  inset: 0;
+  padding: clamp(56px, 6vw, 64px) clamp(22px, 3vw, 44px) clamp(24px, 3vw, 36px);
+}
+
+@media (width < 700px) {
+  .tcard--review.is-open .tcard__panel {
+    padding: 56px 20px 22px;
+  }
+}
+
+.tchip__initial {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  background: linear-gradient(135deg, var(--color-brand), var(--color-ink));
+  color: var(--color-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+}

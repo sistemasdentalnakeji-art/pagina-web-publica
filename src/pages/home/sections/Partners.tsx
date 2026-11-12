@@ -10,6 +10,7 @@
 // • Estilos → src/styles/pages/home/partners.css.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { ParticlesBackground } from '@/components/decor/ParticlesBackground'
 import type { CSSProperties } from 'react'
 import { useLang } from '@/app/lang'
 import { PARTNER_GROUPS, PARTNERS_CTA, PARTNERS_CTA_LABEL, type Partner } from '@/data/partners'
@@ -58,6 +59,7 @@ export function Partners() {
       className="partners-band"
       labelledBy="aseguranzas-titulo"
       waveTop="plain"
+      decor={<ParticlesBackground density={110} max={180} />}
     >
       <div className="container">
         <header className="section-head">

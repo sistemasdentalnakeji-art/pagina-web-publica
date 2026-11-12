@@ -13,6 +13,7 @@
 .benefit-card__top,
 .benefit-card__footer,
 .contact-card,
+.social-wall,
 .legal-card,
 .schedule__form,
 .rail,
@@ -27,7 +28,8 @@
 
 /* Paneles que antes tenían otro fondo: borde de 1 px (la luz del borde lo pinta --glass-edge) y trazo continuo. */
 .rail,
-.promo {
+.promo,
+.social-wall {
   border: 1px solid transparent;
 }
 
@@ -102,18 +104,21 @@
 }
 
 
-@media (width < 960px) {
-  /* Los 4 beneficios del hero (tarjetas chicas 2x2 en celular; en escritorio son pastillas y siguen blancas). */
-  .catalog-hero__features li {
-    border-color: var(--card-blue-border);
-    background: var(--card-blue);
-    box-shadow: var(--card-blue-shadow);
-    color: var(--card-blue-title);
-  }
+/* Los 4 beneficios del hero (tarjetas chicas 2x2 en celular, pastillas en escritorio): azules en ambos, con el ícono dorado. */
+.catalog-hero__features li {
+  border-color: var(--card-blue-border);
+  background: var(--card-blue);
+  box-shadow: var(--card-blue-shadow);
+  color: var(--card-blue-title);
+}
 
+.catalog-hero__features svg {
+  color: var(--color-gold);
+}
+
+@media (width < 960px) {
   .catalog-hero__features svg {
     background: rgba(255, 255, 255, 0.1);
-    color: var(--color-brand-light);
   }
 
   /* Acordeón de categorías: el contenedor blanco también pasa a azul. */
@@ -173,9 +178,13 @@
   color: var(--card-blue-text);
 }
 
-.benefit-card__footer::before,
-.benefit-card__footer::after {
+.benefit-card__footer::before {
   border-top-color: var(--card-blue-line);
+}
+
+/* Orilla de arriba del talón al arrancarse: punteada roja, igual que el resto del contorno (antes quedaba gris continua). */
+.benefit-card__footer::after {
+  border-top: 2px dashed var(--promo-red);
 }
 
 .benefit-card__cta {

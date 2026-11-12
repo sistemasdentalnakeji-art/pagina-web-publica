@@ -7,7 +7,7 @@
 //
 // PENDIENTE DE CONFIRMAR (clínica / abogado) antes de dar el texto por definitivo:
 //  • Clínica: fecha de publicación (`updated`), plazo de cancelación (24 h), anticipos/reembolsos/garantías,
-//    que el SSN se pida solo por teléfono y se borre tras verificar, que el sitio no use analítica ni cookies de rastreo.
+//    que el SSN se pida solo por teléfono y se borre tras verificar, que el sitio use solo analítica de Vercel sin cookies (ya mencionada en la sección de cookies) y ninguna cookie de rastreo.
 //  • Abogado: plazo ARCO (20 días hábiles) y autoridad vigente (LFPDPPP 2025), conservación del expediente (NOM-004, 5 años),
 //    alcance de HIPAA, tribunales de Tijuana y Profeco, fotos/testimonios (Cofepris), art. 83 de la Ley General de Salud.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -212,6 +212,7 @@ export const PRIVACY_PAGE_ES: LegalDoc = {
       title: 'Cookies y contenido de terceros',
       blocks: [
         'Nuestro sitio no usa cookies propias de publicidad ni de rastreo.',
+        'Para saber cuántas personas visitan el sitio y qué tan rápido carga, usamos las herramientas de estadísticas de nuestro proveedor de alojamiento (Vercel). Miden visitas, páginas vistas, país, tipo de dispositivo y velocidad de carga de forma agregada, sin cookies y sin identificarle personalmente.',
         'Algunas páginas muestran contenido de terceros, como Facebook e Instagram (Meta), que puede usar cookies y recabar datos de su navegación conforme a sus propias políticas. Nuestro formulario usa Cloudflare Turnstile para distinguir personas de robots, lo que analiza datos técnicos de su navegador.',
         'Puede bloquear o borrar las cookies desde la configuración de su navegador.',
       ],
@@ -574,6 +575,7 @@ export const PRIVACY_PAGE: LegalDoc = {
       title: 'Cookies and third-party content',
       blocks: [
         'Our website does not use our own advertising or tracking cookies.',
+        'To learn how many people visit the site and how fast it loads, we use the statistics tools of our hosting provider (Vercel). They measure visits, page views, country, device type and loading speed in aggregate, without cookies and without identifying you personally.',
         'Some pages show third-party content, such as Facebook and Instagram (Meta), which may use cookies and collect browsing data under their own policies. Our form uses Cloudflare Turnstile to tell people from bots, which analyzes technical data from your browser.',
         'You can block or delete cookies in your browser settings.',
       ],

@@ -7,7 +7,7 @@
 //     de fotos grandes y nítidas y otro lejano de fotos chicas, difuminadas y apagadas. Las fotos miran siempre de frente
 //     (se contra-giran), solo cambia su tamaño por la perspectiva;
 //   • con el cursor encima la órbita "rebota": se inclina un poco hacia donde apuntas y vuelve;
-//     se puede arrastrar (con inercia) y los botones anterior/siguiente llevan la foto elegida al frente.
+//     se puede arrastrar (con inercia); sin botones anterior/siguiente abajo: al abrir una foto, el visor trae los suyos.
 //   • un clic despliega la foto dentro del panel, con el mismo resorte que LocationMap; al cerrar vuelve a su lugar.
 //   • NO se mueve con la rueda del mouse (se la quitaría al scroll de la página).
 // • Sin movimiento ("reducir movimiento" o "Pausar animaciones"): la órbita queda quieta y completa; los botones cambian de
@@ -275,9 +275,6 @@ export function SpinShutter({ photos, label, speed = 2.2, tilt = 30, roll = 26 }
     holdUntil.current = now + HOLD_MS
   }
 
-  /** Anterior / siguiente parten de la foto a la que ya va la órbita (si no, dos clics rápidos avanzarían uno). */
-  const goBy = (delta: number, now: number) => goTo((snapTo.current !== null ? targetIndex.current : frontIndex.current) + delta, now)
-
   // Arrastre con inercia. El puntero solo se captura cuando ya se movió (DRAG_START_PX).
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return
@@ -386,15 +383,6 @@ export function SpinShutter({ photos, label, speed = 2.2, tilt = 30, roll = 26 }
             ))}
           </div>
         </div>
-      </div>
-
-      <div className="spin-shutter__bar" inert={!!expandedPhoto}>
-        <button type="button" className="spin-shutter__nav" aria-label={ui.prev} onClick={(event) => goBy(-1, event.timeStamp)}>
-          <Icon name="chevronLeft" size={22} />
-        </button>
-        <button type="button" className="spin-shutter__nav" aria-label={ui.next} onClick={(event) => goBy(1, event.timeStamp)}>
-          <Icon name="chevronRight" size={22} />
-        </button>
       </div>
 
       <div

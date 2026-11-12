@@ -32,7 +32,7 @@ export function FibersBackground({ lightMode = false }: { lightMode?: boolean })
         secondaryColor={AQUA}
         lineColor="#bfe9f5"
         lightMode={lightMode}
-        dpr={1}
+        dpr={0.75}
         paused={paused}
       />
     </div>

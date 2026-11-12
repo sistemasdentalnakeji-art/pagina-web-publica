@@ -886,7 +886,7 @@ html[data-motion='paused'] .catalog-card__glow {
    mínimo del panel, que era mayor que el contenedor y escondía los botones. */
 @media (width < 768px) {
   .catalog-showcase {
-    height: 430px;
+    height: 360px;
     margin-top: 8px;
     margin-bottom: 40px; /* aire entre el carrusel y el footer */
   }
@@ -897,14 +897,9 @@ html[data-motion='paused'] .catalog-card__glow {
     padding-block: 8px;
   }
 
-  /* Las fotos del arco cercano sobresalen por abajo: la escena deja espacio y los botones van por encima, nunca tapados. */
-  .catalog-showcase .spin-shutter__stage {
-    margin-bottom: 36px;
-  }
-
-  .catalog-showcase .spin-shutter__bar {
-    position: relative;
-    z-index: 5;
+  /* Fotos grandes: llenan el panel (antes quedaban chicas con mucho espacio vacío). Sin flechas abajo: el visor trae las suyas. */
+  .catalog-showcase .spin-shutter__ring {
+    --w: 46cqw;
   }
 }
 

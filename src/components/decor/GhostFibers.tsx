@@ -9,6 +9,12 @@
 import { useEffect, useRef, type HTMLAttributes } from 'react'
 
 const MAX_RENDER_DIM = 2400;
+// Rendimiento: tope de ~30 cuadros por segundo (el movimiento es lento, no se nota) y, si el equipo aun asi va lento,
+// el lienzo baja de resolucion por pasos (el brillo es suave: casi no se ve).
+const MIN_FRAME_MS = 28;
+const SLOW_FRAME_MS = 45;
+const SLOW_FRAMES_TO_DOWNSCALE = 24;
+const MIN_QUALITY = 0.5;
 const BLOOM_LEVELS = 5;
 const INTRO_SECONDS = 2.6;
 const CAMERA = 7.5;
@@ -464,26 +470,27 @@ const COMPOSITE_UNIFORMS = [
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-const compile = (gl: WebGL2RenderingContext, type: number, source: string) => {
-  const shader = gl.createShader(type);
-  if (!shader) return null;
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader;
-  gl.deleteShader(shader);
-  return null;
-};
-
-const link = (gl: WebGL2RenderingContext, vertexSource: string, fragmentSource: string, names: string[]) => {
-  const vertex = compile(gl, gl.VERTEX_SHADER, vertexSource);
-  const fragment = compile(gl, gl.FRAGMENT_SHADER, fragmentSource);
+// Se compila y enlaza en dos tiempos: `beginLink` solo lanza el trabajo (con KHR_parallel_shader_compile el navegador lo hace en
+// otro hilo) y `finishLink` revisa el resultado y busca los uniforms. Asi la pagina no se congela mientras se compilan.
+const beginLink = (gl: WebGL2RenderingContext, vertexSource: string, fragmentSource: string) => {
+  const vertex = gl.createShader(gl.VERTEX_SHADER);
+  const fragment = gl.createShader(gl.FRAGMENT_SHADER);
   const program = gl.createProgram();
   if (!vertex || !fragment || !program) return null;
+  gl.shaderSource(vertex, vertexSource);
+  gl.compileShader(vertex);
+  gl.shaderSource(fragment, fragmentSource);
+  gl.compileShader(fragment);
   gl.attachShader(program, vertex);
   gl.attachShader(program, fragment);
   gl.linkProgram(program);
   gl.deleteShader(vertex);
   gl.deleteShader(fragment);
+  return program;
+};
+
+const finishLink = (gl: WebGL2RenderingContext, program: WebGLProgram | null, names: string[]) => {
+  if (!program) return null;
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
     gl.deleteProgram(program);
     return null;
@@ -552,7 +559,7 @@ interface Camera {
   orient: number[]
 }
 
-type Program = NonNullable<ReturnType<typeof link>>
+type Program = NonNullable<ReturnType<typeof finishLink>>
 
 export interface GhostFibersProps extends HTMLAttributes<HTMLDivElement> {
   glowColor?: string
@@ -719,6 +726,18 @@ export function GhostFibers({
   const settingsRef = useRef(settings);
 
   useEffect(() => {
+    // El WebGL (compilar shaders, reservar memoria) se prepara cuando el navegador queda libre, para no frenar la carga
+    // de la pagina. shortcut: sin requestIdleCallback (Safari) se usa un temporizador corto.
+    let stop: (() => void) | undefined;
+    const ric = window.requestIdleCallback as typeof window.requestIdleCallback | undefined;
+    const handle = ric ? ric(() => (stop = start()), { timeout: 1500 }) : (window.setTimeout(() => (stop = start()), 200) as number);
+    return () => {
+      if (ric) window.cancelIdleCallback(handle as number);
+      else window.clearTimeout(handle);
+      stop?.();
+    };
+
+    function start() {
     const container = containerRef.current;
     const canvas = canvasRef.current;
     const gl = canvas?.getContext('webgl2', {
@@ -730,13 +749,26 @@ export function GhostFibers({
     });
     if (!container || !canvas || !gl) return undefined;
 
+    const jobs = [
+      beginLink(gl, DOT_VERTEX, DOT_FRAGMENT),
+      beginLink(gl, DUST_VERTEX, DOT_FRAGMENT),
+      beginLink(gl, FULLSCREEN, BRIGHT_FRAGMENT),
+      beginLink(gl, FULLSCREEN, DOWN_FRAGMENT),
+      beginLink(gl, FULLSCREEN, UP_FRAGMENT),
+      beginLink(gl, FULLSCREEN, COMPOSITE_FRAGMENT)
+    ];
+    const parallel = gl.getExtension('KHR_parallel_shader_compile');
+    let timer = 0;
+    let teardown: (() => void) | undefined;
+
+    const boot = () => {
     const floatTargets = !!gl.getExtension('EXT_color_buffer_float');
-    const dots = link(gl, DOT_VERTEX, DOT_FRAGMENT, DOT_UNIFORMS);
-    const dust = link(gl, DUST_VERTEX, DOT_FRAGMENT, DUST_UNIFORMS);
-    const bright = link(gl, FULLSCREEN, BRIGHT_FRAGMENT, PASS_UNIFORMS);
-    const down = link(gl, FULLSCREEN, DOWN_FRAGMENT, PASS_UNIFORMS);
-    const up = link(gl, FULLSCREEN, UP_FRAGMENT, PASS_UNIFORMS);
-    const composite = link(gl, FULLSCREEN, COMPOSITE_FRAGMENT, COMPOSITE_UNIFORMS);
+    const dots = finishLink(gl, jobs[0], DOT_UNIFORMS);
+    const dust = finishLink(gl, jobs[1], DUST_UNIFORMS);
+    const bright = finishLink(gl, jobs[2], PASS_UNIFORMS);
+    const down = finishLink(gl, jobs[3], PASS_UNIFORMS);
+    const up = finishLink(gl, jobs[4], PASS_UNIFORMS);
+    const composite = finishLink(gl, jobs[5], COMPOSITE_UNIFORMS);
     if (!dots || !dust || !bright || !down || !up || !composite) return undefined;
 
     const format = floatTargets ? gl.RGBA16F : gl.RGBA8;
@@ -775,6 +807,8 @@ export function GhostFibers({
       width: 1,
       height: 1,
       fit: 1,
+      quality: 1,
+      slow: 0,
       colorKey: '',
       glow: [0.55, 0.36, 0.96],
       line: [1, 0.85, 0.98],
@@ -862,7 +896,7 @@ export function GhostFibers({
       const s = settingsRef.current;
       const width = Math.max(1, container.clientWidth);
       const height = Math.max(1, container.clientHeight);
-      const baseDpr = Math.min(s.dpr || window.devicePixelRatio || 1, 2);
+      const baseDpr = Math.min(s.dpr || window.devicePixelRatio || 1, 2) * state.quality;
       const longest = Math.max(width, height) * baseDpr;
       const ratio = longest > MAX_RENDER_DIM ? (baseDpr * MAX_RENDER_DIM) / longest : baseDpr;
       const pixelWidth = Math.max(1, Math.round(width * ratio));
@@ -1039,6 +1073,10 @@ export function GhostFibers({
       raf = 0;
       if (!alive || !visible || document.hidden) return;
       const s = settingsRef.current;
+      if (last && now - last < MIN_FRAME_MS && !settingsRef.current.paused) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       const elapsed = last ? (now - last) / 1000 : 1 / 60;
       const dt = Math.min(0.05, elapsed);
       last = now;
@@ -1083,6 +1121,14 @@ export function GhostFibers({
       state.focus += (focusGoal - state.focus) * (1 - Math.exp(-dt / 0.35));
 
       render();
+      // Equipo lento (cuadros de mas de 45 ms seguidos): baja la resolucion un escalon, hasta la mitad.
+      if (moving && state.intro >= INTRO_SECONDS && elapsed * 1000 > SLOW_FRAME_MS && elapsed < 0.5) state.slow += 1;
+      else state.slow = 0;
+      if (state.slow >= SLOW_FRAMES_TO_DOWNSCALE && state.quality > MIN_QUALITY) {
+        state.slow = 0;
+        state.quality = Math.max(MIN_QUALITY, state.quality - 0.25);
+        resize();
+      }
       const settling =
         Math.abs(goal - hover.presence) > 0.002 ||
         Math.abs(lookX - look.x) > 0.0002 ||
@@ -1173,6 +1219,21 @@ export function GhostFibers({
       });
       [dots, dust, bright, down, up, composite].forEach(entry => gl.deleteProgram(entry.program));
     };
+    };
+
+    const poll = () => {
+      if (parallel && !jobs.every(job => !job || gl.getProgramParameter(job, parallel.COMPLETION_STATUS_KHR))) {
+        timer = window.setTimeout(poll, 16);
+        return;
+      }
+      teardown = boot();
+    };
+    poll();
+    return () => {
+      window.clearTimeout(timer);
+      teardown?.();
+    };
+    }
   }, []);
 
   // Los ajustes nuevos se guardan después de cada render (no durante él, regla react-hooks/refs) y enseguida se despierta

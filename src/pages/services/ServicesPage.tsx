@@ -14,6 +14,7 @@ import { CATALOG_CTA, CATALOG_GROUPS, CATALOG_HERO, type CatalogService } from '
 import { SHOWCASE_LABEL, SHOWCASE_PHOTOS } from '@/data/servicesShowcase'
 import { Band } from '@/components/decor/Band'
 import { PlasmaBackground } from '@/components/decor/PlasmaBackground'
+import { GlassLights } from '@/components/decor/GlassLights'
 import { Icon } from '@/components/ui/Icon'
 import { SpinShutter } from '@/components/ui/SpinShutter'
 import { TextBlurReveal } from '@/components/ui/TextBlurReveal'
@@ -97,6 +98,7 @@ export function ServicesPage() {
       className="catalog"
       labelledBy="servicios-titulo"
       decor={
+        <>
         <div className="catalog__plasma">
           <PlasmaBackground
             className="catalog__plasma-view"
@@ -110,6 +112,9 @@ export function ServicesPage() {
             maxDpr={1}
           />
         </div>
+        {/* La luz dorada de fondo, como en Beneficios, Contacto y Blog (PagePlasma la incluye; aquí el plasma es propio). */}
+        <GlassLights sides={false} />
+        </>
       }
     >
       <div className="container">

@@ -29,8 +29,8 @@ type Slide =
   | { kind: 'review'; id: string; name: string; t: Testimonial }
   | { kind: 'video'; id: string; name: string; v: (typeof TESTIMONIAL_VIDEOS)[number] }
 
-const VIDEOS: Slide[] = TESTIMONIAL_VIDEOS.slice(0, 5).map((v, i) => ({ kind: 'video', id: `v${i}`, name: v.name, v }))
-const REVIEWS: Slide[] = TESTIMONIALS.slice(0, 4).map((t, i) => ({ kind: 'review', id: `r${i}`, name: t.name, t }))
+const VIDEOS: Slide[] = TESTIMONIAL_VIDEOS.slice(0, 5).map((v, i) => ({ kind: 'video', id: `v${i}`, name: v.name.es, v }))
+const REVIEWS: Slide[] = TESTIMONIALS.slice(0, 5).map((t, i) => ({ kind: 'review', id: `r${i}`, name: t.name, t }))
 
 
 // Celular: una tarjeta a la vez, deslizable (scroll-snap), con chips de navegación debajo.
@@ -117,12 +117,11 @@ function Row({ slides, label, variant }: { slides: Slide[]; label: string; varia
           const isOpen = i === open
           const shown = mobile || isOpen // en celular todas se ven abiertas (una por pantalla)
           const panelId = `${uid}-${s.id}`
-          const photo = s.kind === 'review' ? s.t.photo : undefined
+          const name = s.kind === 'video' ? s.v.name[lang] : s.name
           return (
             <li key={s.id} className={`tcard tcard--${s.kind}${shown ? ' is-open' : ''}`}>
-              {/* Portada: la foto de la reseña o el propio video (el mismo elemento abierto y cerrado: no se reinicia). */}
+              {/* Portada: solo el video; las reseñas ya no llevan foto (el mismo elemento abierto y cerrado: no se reinicia). */}
               <div className="tcard__cover" aria-hidden={s.kind === 'review' || !shown}>
-                {photo && <img src={photo.src} alt="" width={560} height={700} loading="lazy" decoding="async" />}
                 {s.kind === 'video' && (
                   <video
                     playsInline
@@ -153,7 +152,7 @@ function Row({ slides, label, variant }: { slides: Slide[]; label: string; varia
                   </span>
                   {/* Nombre corto visible; el nombre accesible empieza igual (WCAG 2.5.3) y agrega "video". */}
                   <span className="tcard__name">
-                    {s.name}
+                    {name}
                     {s.kind === 'video' && <span className="visually-hidden"> ({s.v.label[lang]})</span>}
                   </span>
                 </button>
@@ -188,19 +187,22 @@ function Row({ slides, label, variant }: { slides: Slide[]; label: string; varia
 
       {mobile && (
         <div className="tchips" role="group" aria-label={label}>
-          {slides.map((s, i) => (
+          {slides.map((s, i) => {
+            const name = s.kind === 'video' ? s.v.name[lang] : s.name
+            return (
             <button key={s.id} type="button" className="tchip" aria-pressed={i === open} onClick={() => i !== open && select(i)}>
               <span className="tchip__thumb" aria-hidden="true">
-                {s.kind === 'review' && s.t.photo && <img src={s.t.photo.src} alt="" width={44} height={44} loading="lazy" decoding="async" />}
+                {s.kind === 'review' && <span className="tchip__initial">{name.charAt(0)}</span>}
                 {s.kind === 'video' && <video muted playsInline preload="metadata" tabIndex={-1} src={`${s.v.src}#t=0.1`} />}
               </span>
               {/* Visible: solo el nombre de pila (cabe en el chip); el nombre completo va para lectores de pantalla. */}
               <span className="tchip__name">
-                <span aria-hidden="true">{s.name.split(' ')[0]}</span>
-                <span className="visually-hidden">{s.kind === 'video' ? s.v.label[lang] : s.name}</span>
+                <span aria-hidden="true">{name.split(' ')[0]}</span>
+                <span className="visually-hidden">{s.kind === 'video' ? s.v.label[lang] : name}</span>
               </span>
             </button>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
